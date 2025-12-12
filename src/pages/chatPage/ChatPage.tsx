@@ -1,51 +1,63 @@
-import { Avatar, AvatarFallback, AvatarImage, Container } from '@/components';
-import { Separator } from '@/components/ui/separator';
+import { ChatArticle, Container, RegisterRequired, SearchInput, Separator } from '@/components';
+import { paths } from '@/constants/constans';
+import { useAuthStore } from '@/store/useAuthStore';
+import clsx from 'clsx';
 import type { FC } from 'react';
-import { Link } from 'react-router';
 
 const chatItems = [
     {
         id: crypto.randomUUID(),
         title: 'Cave',
-        url: '/',
+        url: `${paths.channels}/cave`,
     },
     {
         id: crypto.randomUUID(),
         title: 'Fighters',
-        url: '/',
+        url: `${paths.channels}/fighters`,
     },
     {
         id: crypto.randomUUID(),
         title: 'Coffee drinkers',
-        url: '/',
+        url: `${paths.channels}/coffee-drinkers`,
     },
 ];
 
 export const ChatPage: FC = () => {
+    const isAuth = useAuthStore((state) => state.isAuth);
+
     return (
         <section className="h-full">
-            <Container className="h-full flex flex-col">
-                {chatItems.map((chat) => (
-                    <div
-                        key={chat.id}
-                        className="flex gap-2 items-center border border-neutral-300 p-4 rounded-4xl mt-4">
-                        <Avatar className="size-12">
-                            <AvatarImage src="" />
-                            <AvatarFallback>{chat.title.slice(0, 2).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                        <Separator orientation="vertical" />
-                        <Link to={chat.url}>
-                            <p className="text-gray-700 text-2xl font-bold">{chat.title}</p>
-                        </Link>
-                    </div>
-                ))}
+            <Container>
+                <div
+                    className={clsx(
+                        'flex',
+                        !isAuth && 'justify-center items-center h-[700px]',
+                        isAuth && 'h-full flex-col gap-6',
+                    )}>
+                    {isAuth && (
+                        <>
+                            <SearchInput />
+
+                            <Separator />
+
+                            <ul className="flex flex-col gap-4">
+                                {chatItems.map((chat) => (
+                                    <li>
+                                        <ChatArticle data={chat} />
+                                    </li>
+                                ))}
+                            </ul>
+                        </>
+                    )}
+
+                    {!isAuth && (
+                        <div className="block">
+                            <h2 className="text-2xl text-gray-500">Channels</h2>
+                            <RegisterRequired />
+                        </div>
+                    )}
+                </div>
             </Container>
         </section>
     );
 };
-
-{
-    /* <div className="border border-neutral-300 p-4 rounded-3xl mb-4">
-    <Input placeholder="Chat here" />
-</div>; */
-}

@@ -1,9 +1,10 @@
+import type { User } from '@/types/userInterface';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface AuthStore {
     isAuth: boolean;
-    user: { id: string; name: string } | null;
+    user: User | null;
     setUser: (user: AuthStore['user']) => void;
     logout: () => void;
 }

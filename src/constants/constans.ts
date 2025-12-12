@@ -2,7 +2,8 @@ import { Home, MessageSquareDot, Settings } from 'lucide-react';
 
 export const paths = {
     home: '/',
-    channels: '/channels/:slug',
+    channels: '/channels',
+    channelsDetail: '/channels/:slug',
     notFound: '*',
     register: '/auth/registration',
 };

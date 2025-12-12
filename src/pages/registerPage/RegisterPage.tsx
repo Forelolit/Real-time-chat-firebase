@@ -1,6 +1,7 @@
 import { Button, Container, Input } from '@/components';
 import { useAuthStore } from '@/store/useAuthStore';
-import { Ban, EyeIcon, EyeOffIcon } from 'lucide-react';
+import clsx from 'clsx';
+import { Ban, Check, EyeIcon, EyeOffIcon, X } from 'lucide-react';
 import { useState, type FC } from 'react';
 import { useForm } from 'react-hook-form';
 import type { SubmitHandler } from 'react-hook-form';
@@ -14,11 +15,7 @@ type Inputs = {
     repeatPassword: string;
 };
 
-const passwordRules = [
-    { label: 'Минимум 8 символов', test: (val: string) => val.length >= 8 },
-    { label: 'Хотя бы одна заглавная буква (A–Z)', test: (val: string) => /[A-Z]/.test(val) },
-    { label: 'Хотя бы одна строчная буква (a–z)', test: (val: string) => /[a-z]/.test(val) },
-];
+const passwordRules = [{ label: 'Минимум 6 символов', test: (val: string) => val.length >= 6 }];
 
 export const RegisterPage: FC = () => {
     const navigate = useNavigate();
@@ -70,7 +67,7 @@ export const RegisterPage: FC = () => {
                                 },
                             })}
                         />
-                        {errors.name && <p color="error">{errors.name.message}</p>}
+                        {errors.name && <p className="text-red-500">{errors.name.message}</p>}
 
                         <div className="flex gap-1">
                             <Input
@@ -98,12 +95,16 @@ export const RegisterPage: FC = () => {
                             )}
                         </div>
 
-                        {errors.password && <p color="error">{errors.password.message}</p>}
+                        {errors.password && <p className="text-red-500">{errors.password.message}</p>}
 
                         <ul>
                             {passwordRules.map((rule) => (
-                                <li key={rule.label} style={{ color: rule.test(password) ? 'green' : 'red' }}>
-                                    {rule.test(password) ? '✅' : '❌'} {rule.label}
+                                <li
+                                    key={rule.label}
+                                    className={clsx(
+                                        `${rule.test(password) ? 'text-green-500' : 'text-red-500'} flex items-center`,
+                                    )}>
+                                    {rule.test(password) ? <Check /> : <X />} {rule.label}
                                 </li>
                             ))}
                         </ul>
@@ -117,7 +118,7 @@ export const RegisterPage: FC = () => {
                                 validate: (value) => value === password || 'Пароли не совпадают',
                             })}
                         />
-                        {errors.repeatPassword && <p color="error">{errors.repeatPassword.message}</p>}
+                        {errors.repeatPassword && <p className="text-red-500">{errors.repeatPassword.message}</p>}
 
                         <Button>Регистрация</Button>
                     </form>

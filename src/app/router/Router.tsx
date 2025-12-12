@@ -20,6 +20,10 @@ export const Router = createBrowserRouter([
                 element: <Pages.ChatPage />,
             },
             {
+                path: paths.channelsDetail,
+                element: <Pages.ChatDetailPage />,
+            },
+            {
                 path: paths.register,
                 element: <Pages.RegisterPage />,
             },

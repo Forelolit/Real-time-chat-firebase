@@ -7,21 +7,14 @@ import {
     Separator,
     Spinner,
 } from '@/components';
-import { channelService } from '@/firebase/channelService';
+import { useGetChannelsByIds } from '@/hooks/useGetChannelsByIds';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { type FC } from 'react';
 
 export const ChatPage: FC = () => {
     const isAuth = useAuthStore((state) => state.isAuth);
-    const user = useAuthStore((state) => state.user);
-
-    const { data: channels, isLoading } = useQuery({
-        queryKey: ['channels', user?.channelIds],
-        queryFn: channelService.getChannelsByIds,
-        enabled: !!user?.channelIds,
-    });
+    const { channels, isLoading } = useGetChannelsByIds();
 
     return (
         <section className="h-full">
@@ -37,7 +30,7 @@ export const ChatPage: FC = () => {
                             <SearchInput />
 
                             <AddChannelDialog />
-                            
+
                             <Separator />
 
                             {isLoading && (

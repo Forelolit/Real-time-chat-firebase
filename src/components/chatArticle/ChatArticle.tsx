@@ -6,21 +6,39 @@ import { paths } from '@/constants/constans';
 
 interface ChatArticleProps {
     data: ChannelType;
+    variant?: 'base' | 'outline';
 }
 
-export const ChatArticle: FC<ChatArticleProps> = ({ data }) => {
+export const ChatArticle: FC<ChatArticleProps> = ({ data, variant = 'base' }) => {
     return (
-        <article key={data.id} className="flex gap-2 items-center border border-neutral-300 p-4 rounded-4xl">
-            <Avatar className="size-12">
-                <AvatarImage src="" />
-                <AvatarFallback>{data.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-            </Avatar>
+        <>
+            {variant === 'base' && (
+                <article key={data.id} className="flex gap-2 items-center border border-neutral-300 p-4 rounded-4xl">
+                    <Avatar className="size-12">
+                        <AvatarImage src="" />
+                        <AvatarFallback>{data.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                    </Avatar>
 
-            <Separator orientation="vertical" />
+                    <Separator orientation="vertical" />
 
-            <Link to={`${paths.channels}/${data.id}`}>
-                <p className="text-gray-700 text-2xl font-bold">{data.name}</p>
-            </Link>
-        </article>
+                    <Link to={`${paths.channels}/${data.id}`}>
+                        <p className="text-gray-700 text-2xl font-bold">{data.name}</p>
+                    </Link>
+                </article>
+            )}
+
+            {variant === 'outline' && (
+                <article key={data.id} className="flex gap-2 items-center p-1">
+                    <Avatar className="size-8">
+                        <AvatarImage src="" />
+                        <AvatarFallback className="text-sm">{data.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+
+                    <Link to={`${paths.channels}/${data.id}`}>
+                        <p className="text-gray-800 text-xl font-bold">{data.name}</p>
+                    </Link>
+                </article>
+            )}
+        </>
     );
 };

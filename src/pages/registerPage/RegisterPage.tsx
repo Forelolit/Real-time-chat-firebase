@@ -31,7 +31,6 @@ export const RegisterPage: FC = () => {
         if (currentUser) {
             toast('Current user is active', {
                 icon: <Ban color="red" />,
-                position: 'top-right',
             });
             return false;
         }

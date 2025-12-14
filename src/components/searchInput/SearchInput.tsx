@@ -1,49 +1,70 @@
-import { useState, type FC } from 'react';
-import { ChatArticle, InputGroup, InputGroupAddon, InputGroupInput, Spinner } from '@/components/index';
+import { useState, useRef, type FC } from 'react';
+import { ChatArticle, InputGroup, InputGroupAddon, InputGroupInput, Spinner } from '@/components';
 import { Search } from 'lucide-react';
 import clsx from 'clsx';
 import { useGetChannelsByIds } from '@/hooks/useGetChannelsByIds';
+import { useSearchUsers } from '@/hooks/useSearchUsers';
+import { ChannelForInviteDialog } from '../channelForInviteDialog/ChannelForInviteDialog';
 
 interface SearchInputProps {
     className?: string;
 }
 
 export const SearchInput: FC<SearchInputProps> = ({ className }) => {
-    const { channels, isLoading } = useGetChannelsByIds();
     const [searchText, setSearchText] = useState('');
-    const [isFocused, setIsFocused] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
 
-    const findChannel = (text: string) => {
-        return channels?.filter((t) => t.name.toLowerCase().includes(text.toLowerCase()));
-    };
+    const { data: channels = [], isLoading: isChannelsLoading } = useGetChannelsByIds();
+    const { users = [], isLoading: isUsersLoading } = useSearchUsers(searchText);
 
-    const filteredChannels = searchText ? findChannel(searchText) ?? [] : [];
+    const filteredChannels = searchText
+        ? channels.filter((c) => c.name.toLowerCase().includes(searchText.toLowerCase()))
+        : [];
+
+    const isLoading = isUsersLoading || isChannelsLoading;
+    const hasResults = users.length > 0 || filteredChannels.length > 0;
 
     return (
-        <div className={clsx(className, 'relative border border-neutral-300 w-full p-4 rounded-2xl mt-4')}>
+        <div
+            ref={containerRef}
+            className={clsx(className, 'relative border border-neutral-300 w-full p-4 rounded-2xl mt-4')}>
             <InputGroup>
                 <InputGroupInput
                     placeholder="Search..."
                     value={searchText}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value)}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => {
-                        setTimeout(() => setIsFocused(false), 150);
-                    }}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    onFocus={() => setIsOpen(true)}
                 />
                 <InputGroupAddon>{isLoading ? <Spinner /> : <Search />}</InputGroupAddon>
-                <InputGroupAddon align="inline-end">{filteredChannels?.length ?? 0} results</InputGroupAddon>
             </InputGroup>
 
-            {isFocused && filteredChannels.length > 0 && (
-                <div className="z-10 absolute top-20 left-0 grid gap-2 p-2 rounded-2xl border bg-neutral-100 w-full">
-                    <span className="text-neutral-600 ml-2">Channels</span>
-
-                    {filteredChannels.map((i) => (
-                        <div key={i.id} className="p-1 rounded-xl hover:bg-neutral-50 border">
-                            <ChatArticle variant="outline" data={i} />
+            {isOpen && searchText && hasResults && (
+                <div className="absolute top-20 left-0 z-10 w-full rounded-2xl border bg-neutral-100 p-2 grid gap-3">
+                    {users.length > 0 && (
+                        <div className="grid gap-2">
+                            <span className="text-neutral-600 ml-2 text-sm">Users</span>
+                            {users.map((user) => (
+                                <div
+                                    key={user.uid}
+                                    className="flex items-center justify-between p-2 rounded-xl hover:bg-neutral-50 border cursor-pointer">
+                                    <span>{user.displayName}</span>
+                                    <ChannelForInviteDialog userId={user.uid} channels={channels} />
+                                </div>
+                            ))}
                         </div>
-                    ))}
+                    )}
+
+                    {filteredChannels.length > 0 && (
+                        <div className="grid gap-2">
+                            <span className="text-neutral-600 ml-2 text-sm">Channels</span>
+                            {filteredChannels.map((channel) => (
+                                <div key={channel.id} className="p-1 rounded-xl hover:bg-neutral-50 border">
+                                    <ChatArticle variant="outline" data={channel} />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
         </div>

@@ -3,7 +3,8 @@ import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { Container, Button } from '@/components';
 import { useAuthStore } from '@/store/useAuthStore';
 import { auth, db } from '@/firebase/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import type { User } from '@/types/userInterface';
 
 export const LoginPage: FC = () => {
     const setUser = useAuthStore((state) => state.setUser);
@@ -15,19 +16,22 @@ export const LoginPage: FC = () => {
             const res = await signInWithPopup(auth, provider);
             const firebaseUser = res.user;
 
-            await setDoc(doc(db, 'users', firebaseUser.uid), {
-                uid: firebaseUser.uid,
-                displayName: firebaseUser.displayName,
-                photoURL: firebaseUser.photoURL,
-                channelIds: [],
-            });
+            const userRef = doc(db, 'users', firebaseUser.uid);
+            const userSnap = await getDoc(userRef);
 
-            setUser({
-                uid: firebaseUser.uid,
-                displayName: firebaseUser.displayName,
-                photoURL: firebaseUser.photoURL,
-            });
+            if (!userSnap.exists()) {
+                await setDoc(userRef, {
+                    uid: firebaseUser.uid,
+                    displayName: firebaseUser.displayName,
+                    photoURL: firebaseUser.photoURL,
+                    channelIds: [],
+                    searchTokens: firebaseUser.displayName?.toLowerCase().split(' '),
+                });
+            } else {
+                console.log('User exists, channelIds сохраняются');
+            }
 
+            setUser(userSnap.data() as User);
             return firebaseUser;
         } catch (error) {
             console.error('signInWithGoogle', error);

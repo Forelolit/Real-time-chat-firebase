@@ -10,7 +10,7 @@ export const Layout = () => {
                 <main className="w-full">
                     <Outlet />
                 </main>
-                <Toaster />
+                <Toaster position="top-right" />
             </SidebarProvider>
         </>
     );

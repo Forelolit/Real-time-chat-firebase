@@ -7,14 +7,22 @@ import {
     Separator,
     Spinner,
 } from '@/components';
-import { useGetChannelsByIds } from '@/hooks/useGetChannelsByIds';
+import { useGetChannels } from '@/hooks/useGetChannels';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useChannelStore } from '@/store/useChannelStore';
 import clsx from 'clsx';
-import { type FC } from 'react';
+import { useEffect, type FC } from 'react';
 
 export const ChatPage: FC = () => {
     const isAuth = useAuthStore((state) => state.isAuth);
-    const { channels, isLoading } = useGetChannelsByIds();
+    const { data: channels = [], isLoading } = useGetChannels();
+    const setChannels = useChannelStore((state) => state.setChannels);
+
+    useEffect(() => {
+        if (channels) {
+            setChannels(channels);
+        }
+    }, [channels, setChannels]);
 
     return (
         <section className="h-full">

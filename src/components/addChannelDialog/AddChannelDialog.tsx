@@ -8,6 +8,7 @@ import { serverTimestamp } from 'firebase/firestore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { channelService } from '@/firebase/channelService';
 import { useQueryClient } from '@tanstack/react-query';
+import { useChannelStore } from '@/store/useChannelStore';
 
 interface Inputs {
     name: string;
@@ -18,6 +19,7 @@ export const AddChannelDialog: FC = () => {
     const isAuth = useAuthStore((state) => state.isAuth);
     const user = useAuthStore((state) => state.user);
     const setUser = useAuthStore((state) => state.setUser);
+    const setChannel = useChannelStore((state) => state.setChannel);
     const [open, setOpen] = useState(false);
     const queryClient = useQueryClient();
 
@@ -32,21 +34,21 @@ export const AddChannelDialog: FC = () => {
         if (!isAuth || !user) {
             toast('You need to login first', {
                 icon: <Ban color="red" />,
-                position: 'top-right',
             });
             return;
         }
 
         try {
-            const channelId = await channelService.createChannel({
-                id: crypto.randomUUID(),
+            const channel = await channelService.createChannel({
                 owner: user.uid,
                 memberIds: [user.uid],
                 name: data.name,
                 createdAt: serverTimestamp(),
             });
 
-            const updatedChannelIds = [...(user.channelIds || []), channelId];
+            setChannel(channel);
+
+            const updatedChannelIds = [...(user.channelIds || []), channel.id];
             setUser({
                 ...user,
                 channelIds: updatedChannelIds,
@@ -56,7 +58,6 @@ export const AddChannelDialog: FC = () => {
 
             toast('Channel created successfully', {
                 icon: <Check color="green" />,
-                position: 'top-right',
             });
 
             setOpen(false);
@@ -65,7 +66,6 @@ export const AddChannelDialog: FC = () => {
             console.error('Error creating channel:', error);
             toast('Failed to create channel', {
                 icon: <Ban color="red" />,
-                position: 'top-right',
             });
         }
     };

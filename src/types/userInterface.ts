@@ -1,6 +1,6 @@
 export interface User {
     uid: string;
-    displayName: string;
-    photoURL?: string;
-    channelIds: string[] | null;
+    displayName: string | null;
+    photoURL?: string | null;
+    channelIds?: string[] | null;
 }

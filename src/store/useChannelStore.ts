@@ -1,12 +1,17 @@
-import { create } from 'zustand';
 import type { ChannelType } from '@/types/channeInterface';
+import { create } from 'zustand';
 
 interface ChannelStore {
-    activeChannel: ChannelType | null;
-    setActiveChannel: (channel: ChannelType | null) => void;
+    channels: ChannelType[];
+    setChannel: (channel: ChannelType) => void;
+    setChannels: (channels: ChannelType[]) => void;
 }
 
-export const useChannelStore = create<ChannelStore>()((set) => ({
-    activeChannel: null,
-    setActiveChannel: (channel) => set({ activeChannel: channel }),
+export const useChannelStore = create<ChannelStore>((set) => ({
+    channels: [],
+    setChannel: (channel) =>
+        set((state) => ({
+            channels: [...state.channels, channel],
+        })),
+    setChannels: (channels) => set({ channels }),
 }));

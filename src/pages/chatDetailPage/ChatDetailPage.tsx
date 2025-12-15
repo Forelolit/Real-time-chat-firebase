@@ -61,8 +61,8 @@ export const ChatDetailPage: FC = () => {
     };
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+        messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+    }, [membersLoading]);
 
     useEffect(() => {
         if (!sending) {
@@ -71,76 +71,72 @@ export const ChatDetailPage: FC = () => {
     }, [sending]);
 
     return (
-        <section className="h-full overflow-y-auto">
+        <section>
             <Container>
-                <div className="relative h-screen flex flex-col justify-between">
-                    <ChatDetailHeader channel={channel} members={members} membersLoading={membersLoading} slug={slug} />
+                <div className="relative min-h-screen flex flex-col gap-5">
+                    <ChatDetailHeader
+                        channel={channel}
+                        members={members}
+                        channelLoading={channelLoading}
+                        membersLoading={membersLoading}
+                    />
+                    <div className="flex-1 p-4">
+                        {channelLoading || membersLoading ? (
+                            <p className="text-gray-500 text-center">Loading messages...</p>
+                        ) : messages.length === 0 ? (
+                            <p className="text-gray-500 text-center">No messages yet. Start the conversation!</p>
+                        ) : (
+                            <div className="flex flex-col gap-5 overflow-y-auto">
+                                {messages
+                                    .slice()
+                                    .reverse()
+                                    .map((mes) => {
+                                        const isCurrentUser = currentUser?.uid === mes.senderId;
+                                        const sender = membersMap?.get(mes.senderId) ?? null;
 
-                    <div className="h-fit flex flex-col gap-5">
-                        <div className="flex-1 overflow-y-auto p-4">
-                            {channelLoading ? (
-                                <div className="flex items-center justify-center h-full">
-                                    <p className="text-gray-500">Loading messages...</p>
-                                </div>
-                            ) : messages.length === 0 ? (
-                                <div className="flex items-center justify-center h-full">
-                                    <p className="text-gray-500">No messages yet. Start the conversation!</p>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col gap-5">
-                                    {messages
-                                        .slice()
-                                        .reverse()
-                                        .map((mes) => {
-                                            const isCurrentUser = currentUser?.uid === mes.senderId;
-                                            const sender = membersMap?.get(mes.senderId) ?? null;
-
-                                            if (isCurrentUser) {
-                                                return (
-                                                    <ChatDetailCurrentUserMessage
-                                                        key={mes.id}
-                                                        currentUser={currentUser}
-                                                        mes={mes}
-                                                    />
-                                                );
-                                            }
-
+                                        if (isCurrentUser) {
                                             return (
-                                                <ChatDetailOtherUserMessage key={mes.id} mes={mes} sender={sender} />
+                                                <ChatDetailCurrentUserMessage
+                                                    key={mes.id}
+                                                    currentUser={currentUser}
+                                                    mes={mes}
+                                                />
                                             );
-                                        })}
+                                        }
 
-                                    <div ref={messagesEndRef} />
-                                </div>
-                            )}
-                        </div>
+                                        return <ChatDetailOtherUserMessage key={mes.id} mes={mes} sender={sender} />;
+                                    })}
 
-                        <div className="sticky bottom-0 w-full bg-neutral-50 border-t border-neutral-300 p-4">
-                            <InputGroup>
-                                <InputGroupInput
-                                    placeholder="Chat..."
-                                    value={inputMes}
-                                    onChange={(e) => setInputMes(e.target.value)}
-                                    onKeyDown={enterMesHandler}
-                                    disabled={sending}
-                                    ref={inputRef}
-                                />
+                                <div ref={messagesEndRef} />
+                            </div>
+                        )}
+                    </div>
 
-                                <InputGroupAddon align="inline-end">
-                                    <Separator orientation="vertical" className="h-4!" />
+                    <div className="sticky bottom-0 bg-neutral-50 border-t border-neutral-300 p-4">
+                        <InputGroup>
+                            <InputGroupInput
+                                placeholder="Chat..."
+                                value={inputMes}
+                                onChange={(e) => setInputMes(e.target.value)}
+                                onKeyDown={enterMesHandler}
+                                disabled={sending}
+                                ref={inputRef}
+                            />
 
-                                    <InputGroupButton
-                                        variant="default"
-                                        className="rounded-full"
-                                        size="icon-xs"
-                                        onClick={() => sendMesHandler(inputMes)}
-                                        disabled={sending || !inputMes.trim()}>
-                                        <ArrowUpIcon />
-                                        <span className="sr-only">Send</span>
-                                    </InputGroupButton>
-                                </InputGroupAddon>
-                            </InputGroup>
-                        </div>
+                            <InputGroupAddon align="inline-end">
+                                <Separator orientation="vertical" className="h-4!" />
+
+                                <InputGroupButton
+                                    variant="default"
+                                    className="rounded-full"
+                                    size="icon-xs"
+                                    onClick={() => sendMesHandler(inputMes)}
+                                    disabled={sending || !inputMes.trim()}>
+                                    <ArrowUpIcon />
+                                    <span className="sr-only">Send</span>
+                                </InputGroupButton>
+                            </InputGroupAddon>
+                        </InputGroup>
                     </div>
                 </div>
             </Container>

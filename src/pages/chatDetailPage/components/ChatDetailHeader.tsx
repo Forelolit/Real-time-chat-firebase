@@ -20,31 +20,29 @@ import type { FC } from 'react';
 
 interface ChatDetailHeaderProps {
     channel: ChannelType | undefined | null;
-    membersLoading: boolean;
+    channelLoading: boolean;
     members: User[] | undefined;
-    slug: string | undefined;
+    membersLoading: boolean;
 }
 
-export const ChatDetailHeader: FC<ChatDetailHeaderProps> = ({ channel, members, membersLoading, slug }) => {
+export const ChatDetailHeader: FC<ChatDetailHeaderProps> = ({ channel, members, membersLoading, channelLoading }) => {
     return (
         <div className="z-20 sticky top-0 flex justify-between items-center p-2 border-b bg-white">
             <div className="flex gap-3 items-center">
                 <Avatar className="size-12">
                     <AvatarImage src={channel?.channelImage} />
                     <AvatarFallback>
-                        {channel?.name ? (
-                            channel.name.slice(0, 2).toUpperCase()
-                        ) : slug ? (
-                            slug.slice(0, 2).toUpperCase()
-                        ) : (
+                        {!channel?.name && channelLoading ? (
                             <Skeleton className="h-12 w-12 rounded-full" />
+                        ) : (
+                            channel?.name.slice(0, 2).toUpperCase()
                         )}
                     </AvatarFallback>
                 </Avatar>
 
                 <Separator orientation="vertical" className="h-6!" />
 
-                <h2>{channel?.name || slug || <Skeleton className="h-4 w-[200px]" />}</h2>
+                <h2>{!channel?.name && channelLoading ? <Skeleton className="h-4 w-[200px]" /> : channel?.name}</h2>
             </div>
 
             <DropdownMenu>

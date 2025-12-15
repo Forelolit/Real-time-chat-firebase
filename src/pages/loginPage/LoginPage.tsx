@@ -19,19 +19,23 @@ export const LoginPage: FC = () => {
             const userRef = doc(db, 'users', firebaseUser.uid);
             const userSnap = await getDoc(userRef);
 
+            let userData: User;
+
             if (!userSnap.exists()) {
-                await setDoc(userRef, {
+                userData = {
                     uid: firebaseUser.uid,
                     displayName: firebaseUser.displayName,
                     photoURL: firebaseUser.photoURL,
                     channelIds: [],
-                    searchTokens: firebaseUser.displayName?.toLowerCase().split(' '),
-                });
+                    searchTokens: firebaseUser.displayName?.toLowerCase().split(' ') ?? [],
+                };
+
+                await setDoc(userRef, userData);
             } else {
-                console.log('User exists, channelIds сохраняются');
+                userData = userSnap.data() as User;
             }
 
-            setUser(userSnap.data() as User);
+            setUser(userData);
             return firebaseUser;
         } catch (error) {
             console.error('signInWithGoogle', error);

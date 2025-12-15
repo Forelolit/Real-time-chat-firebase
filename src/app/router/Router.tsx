@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router';
 import * as Pages from '@/pages/index';
 import { paths } from '@/constants/constans';
 import { Layout } from '@/app/layout';
+import { PrivateRoute } from './PrivateRoute';
 
 export const Router = createBrowserRouter([
     {
@@ -30,6 +31,15 @@ export const Router = createBrowserRouter([
             {
                 path: paths.login,
                 element: <Pages.LoginPage />,
+            },
+            {
+                element: <PrivateRoute />,
+                children: [
+                    {
+                        path: paths.channelsDetail,
+                        element: <Pages.ChatDetailPage />,
+                    },
+                ],
             },
         ],
     },

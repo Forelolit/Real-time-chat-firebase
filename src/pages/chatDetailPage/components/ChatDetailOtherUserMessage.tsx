@@ -9,15 +9,17 @@ interface ChatDetailOtherUserMessageProps {
 }
 
 export const ChatDetailOtherUserMessage: FC<ChatDetailOtherUserMessageProps> = ({ mes, sender }) => {
+    const senderFallback = !sender ? 'Deleted user' : sender.displayName;
+
     return (
         <div key={mes.id} className="flex flex-row gap-2 w-full">
             <Avatar className="size-10 self-end">
                 <AvatarImage src={sender?.photoURL ?? ''} />
-                <AvatarFallback>{mes.senderId.slice(0, 2).toUpperCase()}</AvatarFallback>
+                <AvatarFallback>{senderFallback?.slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
 
             <div className="flex flex-col max-w-[50%]">
-                <span className="text-xs text-neutral-500 mb-1">{sender?.displayName}</span>
+                <span className="text-xs text-neutral-500 mb-1">{senderFallback}</span>
 
                 <div className="bg-gray-200 text-neutral-900 wrap-break-word break-normal px-4 py-2 rounded-2xl rounded-tl-none shadow-sm">
                     {mes.text}

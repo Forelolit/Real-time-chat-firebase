@@ -10,6 +10,7 @@ import {
     where,
     getDocs,
     limit,
+    arrayRemove,
 } from 'firebase/firestore';
 import type { User } from '@/types/userInterface';
 
@@ -71,6 +72,26 @@ const addUserToChannel = async (userId: string, channelId: string) => {
     }
 };
 
+const deleteUserFromChannelById = async (userId: string, channelId: string) => {
+    if (!userId || !channelId) return;
+
+    const channelRef = doc(db, 'channels', channelId);
+    const userRef = doc(db, 'users', userId);
+
+    try {
+        await updateDoc(channelRef, {
+            memberIds: arrayRemove(userId),
+        });
+
+        await updateDoc(userRef, {
+            channelIds: arrayRemove(channelId),
+        });
+        console.log(`User ${userId} removed from channel ${channelId}`);
+    } catch (error) {
+        console.error('Failed to remove user from channel:', error);
+    }
+};
+
 const getUsersByIds = async (memberIds: string[]): Promise<User[]> => {
     if (!memberIds || memberIds.length === 0) {
         return [];
@@ -118,4 +139,5 @@ export const userService = {
     getUsersByIds,
     searchUsers,
     addUserToChannel,
+    deleteUserFromChannelById,
 };

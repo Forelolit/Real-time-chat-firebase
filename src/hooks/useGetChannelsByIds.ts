@@ -7,7 +7,7 @@ export const useGetChannelsByIds = () => {
 
     return useQuery({
         queryKey: ['channels', user?.channelIds],
-        queryFn: channelService.getChannelsByIds,
+        queryFn: () => channelService.getChannelsByIds(user?.channelIds ?? []),
         enabled: !!user?.channelIds,
     });
 };

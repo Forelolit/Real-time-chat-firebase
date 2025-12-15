@@ -13,11 +13,12 @@ import { useRealtimeMessages } from '@/hooks/useRealtimeMessages';
 import { useAuthStore } from '@/store/useAuthStore';
 import { ArrowUpIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type FC } from 'react';
-import { useParams } from 'react-router';
+import { Navigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import { ChatDetailHeader } from './components/ChatDetailHeader';
 import { ChatDetailCurrentUserMessage } from './components/ChatDetailCurrentUserMessage';
 import { ChatDetailOtherUserMessage } from './components/ChatDetailOtherUserMessage';
+import { paths } from '@/constants/constans';
 
 export const ChatDetailPage: FC = () => {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -30,12 +31,35 @@ export const ChatDetailPage: FC = () => {
     const { data: channel, isLoading: channelLoading } = useGetChannelById(slug);
     const memberIds = channel?.memberIds;
     const { data: members, isLoading: membersLoading } = useGetChannelUsers(memberIds ?? []);
-
     const { messages } = useRealtimeMessages(slug || null);
 
     const membersMap = useMemo(() => {
         return new Map(members?.map((user) => [user.uid, user]));
     }, [members]);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+    }, [membersLoading]);
+
+    useEffect(() => {
+        if (!sending) {
+            inputRef.current?.focus();
+        }
+    }, [sending]);
+
+    if (!currentUser) {
+        return <Navigate to={paths.login} replace />;
+    }
+
+    if (!channel) {
+        return <Navigate to={paths.channels} replace />;
+    }
+
+    const isMember = channel?.memberIds.includes(currentUser.uid);
+
+    if (!isMember) {
+        return <Navigate to={paths.channels} replace />;
+    }
 
     const sendMesHandler = async (mes: string) => {
         if (!mes.trim() || !slug) return;
@@ -59,16 +83,6 @@ export const ChatDetailPage: FC = () => {
             sendMesHandler(inputMes);
         }
     };
-
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
-    }, [membersLoading]);
-
-    useEffect(() => {
-        if (!sending) {
-            inputRef.current?.focus();
-        }
-    }, [sending]);
 
     return (
         <section>

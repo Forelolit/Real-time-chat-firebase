@@ -13,6 +13,8 @@ import {
     Skeleton,
     Spinner,
 } from '@/components/index';
+import { userService } from '@/firebase/userService';
+import { useAuthStore } from '@/store/useAuthStore';
 import type { ChannelType } from '@/types/channeInterface';
 import type { User } from '@/types/userInterface';
 import { Users } from 'lucide-react';
@@ -26,6 +28,10 @@ interface ChatDetailHeaderProps {
 }
 
 export const ChatDetailHeader: FC<ChatDetailHeaderProps> = ({ channel, members, membersLoading, channelLoading }) => {
+    const removeUser = userService.deleteUserFromChannelById;
+    const currentUserId = useAuthStore((state) => state.user?.uid);
+    const channelId = channel?.id ? channel.id : '';
+
     return (
         <div className="z-20 sticky top-0 flex justify-between items-center p-2 border-b bg-white">
             <div className="flex gap-3 items-center">
@@ -59,15 +65,24 @@ export const ChatDetailHeader: FC<ChatDetailHeaderProps> = ({ channel, members, 
                     )}
                     {members?.map((m) => (
                         <DropdownMenuItem key={m.uid}>
-                            <div className="w-full flex gap-2 justify-between">
-                                <div className="flex gap-2 items-center">
+                            <div className="w-full flex gap-2 justify-between items-center">
+                                <div className="flex gap-2 items-center max-w-[220px]">
                                     <Avatar>
                                         <AvatarImage src={m.photoURL ?? ''} />
                                         <AvatarFallback>{m.displayName?.slice(0, 2).toUpperCase()}</AvatarFallback>
                                     </Avatar>
-                                    <span className="truncate max-w-[200px]">{m.displayName}</span>
+                                    <span className="truncate max-w-full">{m.displayName}</span>
+                                    {m.uid === currentUserId && (
+                                        <>
+                                            <Separator orientation="vertical" className="h-6!" />
+                                            <span>You</span>
+                                        </>
+                                    )}
                                 </div>
-                                <Button>Kick</Button>
+
+                                {currentUserId === channel?.owner && m.uid !== channel?.owner && (
+                                    <Button onClick={() => removeUser(m.uid, channelId)}>Kick</Button>
+                                )}
                             </div>
                         </DropdownMenuItem>
                     ))}

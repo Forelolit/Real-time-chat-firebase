@@ -24,3 +24,30 @@ This repository is designed as a practical example of how to build a realtime ap
 * **shadcn/ui**
 * **React Router**
 * **Vite**
+
+## Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/forelolit/sibers.git
+cd sibers
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Run the development server
+
+```bash
+npm run dev
+```
+
+The application will be available at:
+
+```
+http://localhost:5173
+```

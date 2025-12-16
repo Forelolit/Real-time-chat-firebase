@@ -9,20 +9,12 @@ import {
 } from '@/components';
 import { useGetChannels } from '@/hooks/useGetChannels';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useChannelStore } from '@/store/useChannelStore';
 import clsx from 'clsx';
-import { useEffect, type FC } from 'react';
+import { type FC } from 'react';
 
 export const ChatPage: FC = () => {
     const isAuth = useAuthStore((state) => state.isAuth);
     const { data: channels = [], isLoading } = useGetChannels();
-    const setChannels = useChannelStore((state) => state.setChannels);
-
-    useEffect(() => {
-        if (channels) {
-            setChannels(channels);
-        }
-    }, [channels, setChannels]);
 
     return (
         <section className="h-full">

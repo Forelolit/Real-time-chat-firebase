@@ -1,10 +1,11 @@
 import { useState, useRef, type FC } from 'react';
-import { ChatArticle, InputGroup, InputGroupAddon, InputGroupInput, Spinner } from '@/components';
+import { ChatArticle, InputGroup, InputGroupAddon, InputGroupInput, Separator, Spinner } from '@/components';
 import { Search } from 'lucide-react';
 import clsx from 'clsx';
 import { useGetChannelsByIds } from '@/hooks/useGetChannelsByIds';
 import { useSearchUsers } from '@/hooks/useSearchUsers';
 import { ChannelForInviteDialog } from '../channelForInviteDialog/ChannelForInviteDialog';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface SearchInputProps {
     className?: string;
@@ -15,6 +16,7 @@ export const SearchInput: FC<SearchInputProps> = ({ className }) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
+    const currentUserId = useAuthStore((state) => state.user?.uid);
     const { data: channels = [], isLoading: isChannelsLoading } = useGetChannelsByIds();
     const { users = [], isLoading: isUsersLoading } = useSearchUsers(searchText);
 
@@ -44,14 +46,27 @@ export const SearchInput: FC<SearchInputProps> = ({ className }) => {
                     {users.length > 0 && (
                         <div className="grid gap-2">
                             <span className="text-neutral-600 ml-2 text-sm">Users</span>
-                            {users.map((user) => (
-                                <div
-                                    key={user.uid}
-                                    className="flex items-center justify-between p-2 rounded-xl hover:bg-neutral-50 border cursor-pointer">
-                                    <span>{user.displayName}</span>
-                                    <ChannelForInviteDialog userId={user.uid} channels={channels} />
-                                </div>
-                            ))}
+                            {users.map((user) => {
+                                if (user.uid === currentUserId)
+                                    return (
+                                        <div
+                                            key={user.uid}
+                                            className="flex items-center gap-2 p-2 rounded-xl hover:bg-neutral-50 border cursor-pointer">
+                                            <span>{user.displayName}</span>
+                                            <Separator orientation="vertical" />
+                                            <span>You</span>
+                                        </div>
+                                    );
+
+                                return (
+                                    <div
+                                        key={user.uid}
+                                        className="flex items-center justify-between p-2 rounded-xl hover:bg-neutral-50 border cursor-pointer">
+                                        <span>{user.displayName}</span>
+                                        <ChannelForInviteDialog userId={user.uid} channels={channels} />
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
 

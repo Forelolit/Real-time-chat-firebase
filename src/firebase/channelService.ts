@@ -23,6 +23,8 @@ const createChannel = async (channelData: CreateChannelDto): Promise<ChannelType
     }
 };
 
+//FIXME Пересмотреть функции ниже
+
 const getChannelsByIds = async (channelIds: string[]): Promise<ChannelType[]> => {
     if (!channelIds || channelIds.length === 0) {
         return [];

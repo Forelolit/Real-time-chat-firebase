@@ -8,7 +8,6 @@ import { serverTimestamp } from 'firebase/firestore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { channelService } from '@/firebase/channelService';
 import { useQueryClient } from '@tanstack/react-query';
-import { useChannelStore } from '@/store/useChannelStore';
 
 interface Inputs {
     name: string;
@@ -16,10 +15,7 @@ interface Inputs {
 }
 
 export const AddChannelDialog: FC = () => {
-    const isAuth = useAuthStore((state) => state.isAuth);
-    const user = useAuthStore((state) => state.user);
-    const setUser = useAuthStore((state) => state.setUser);
-    const setChannel = useChannelStore((state) => state.setChannel);
+    const { isAuth, user, setUser } = useAuthStore();
     const [open, setOpen] = useState(false);
     const queryClient = useQueryClient();
 
@@ -45,8 +41,6 @@ export const AddChannelDialog: FC = () => {
                 name: data.name,
                 createdAt: serverTimestamp(),
             });
-
-            setChannel(channel);
 
             const updatedChannelIds = [...(user.channelIds || []), channel.id];
             setUser({

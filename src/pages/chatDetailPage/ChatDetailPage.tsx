@@ -5,6 +5,7 @@ import {
     InputGroupButton,
     InputGroupInput,
     Separator,
+    Spinner,
 } from '@/components/index';
 import { messageService } from '@/firebase/messageService';
 import { useGetChannelById } from '@/hooks/useGetChannelById';
@@ -51,12 +52,19 @@ export const ChatDetailPage: FC = () => {
         return <Navigate to={paths.login} replace />;
     }
 
+    if (channelLoading) {
+        return (
+            <div className="h-screen w-full flex justify-center items-center">
+                <Spinner className="size-8" />
+            </div>
+        );
+    }
+
     if (!channel) {
         return <Navigate to={paths.channels} replace />;
     }
 
-    const isMember = channel?.memberIds.includes(currentUser.uid);
-
+    const isMember = channel.memberIds.includes(currentUser.uid);
     if (!isMember) {
         return <Navigate to={paths.channels} replace />;
     }

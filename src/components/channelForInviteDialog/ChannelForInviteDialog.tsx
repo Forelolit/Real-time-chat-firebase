@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { useState, type FC } from 'react';
 import {
     Avatar,
     AvatarFallback,
@@ -21,19 +21,28 @@ interface ChannelForInviteDialogProps {
 }
 
 export const ChannelForInviteDialog: FC<ChannelForInviteDialogProps> = ({ userId, channels }) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [localChannels, setLocalChannels] = useState<ChannelType[]>(channels);
+
     const handleAddUser = async (userId: string, channelId: string) => {
+        setIsLoading(true);
+
+        setLocalChannels((prev) =>
+            prev.map((channel) =>
+                channel.id === channelId ? { ...channel, memberIds: [...channel.memberIds, userId] } : channel,
+            ),
+        );
+
         try {
             await userService.addUserToChannel(userId, channelId);
             toast.success('User added to channel');
-
-            //FIXME сделать проверку на наличие юзера в канале
         } catch (error) {
-            toast.error(error.message);
+            setLocalChannels(channels);
+            toast.error(error instanceof Error ? error.message : 'Error');
+        } finally {
+            setIsLoading(false);
         }
     };
-    {
-        console.log(channels);
-    }
 
     return (
         <Dialog>
@@ -48,19 +57,29 @@ export const ChannelForInviteDialog: FC<ChannelForInviteDialogProps> = ({ userId
 
                 <DialogDescription>Select a channel to invite a member</DialogDescription>
 
-                {channels ? (
-                    channels?.map((channel) => (
-                        <div key={channel.id} className="flex justify-between items-center border rounded p-1">
-                            <div className="flex items-center gap-4">
-                                <Avatar>
-                                    <AvatarImage src={channel.channelImage} />
-                                    <AvatarFallback>{channel.name.slice(0, 2).toUpperCase()}</AvatarFallback>
-                                </Avatar>
-                                <span>{channel.name}</span>
+                {localChannels.length ? (
+                    localChannels.map((channel) => {
+                        const isMember = channel.memberIds.includes(userId);
+
+                        return (
+                            <div key={channel.id} className="flex justify-between items-center border rounded p-1">
+                                <div className="flex items-center gap-4">
+                                    <Avatar>
+                                        <AvatarImage src={channel.channelImage} />
+                                        <AvatarFallback>{channel.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                    </Avatar>
+                                    <span>{channel.name}</span>
+                                </div>
+
+                                {!isMember && (
+                                    <Button disabled={isLoading} onClick={() => handleAddUser(userId, channel.id)}>
+                                        Select
+                                    </Button>
+                                )}
+                                {isMember && <span className="text-neutral-500 text-sm">Already in channel</span>}
                             </div>
-                            <Button onClick={() => handleAddUser(userId, channel.id)}>Select</Button>
-                        </div>
-                    ))
+                        );
+                    })
                 ) : (
                     <div>No invitation chats</div>
                 )}

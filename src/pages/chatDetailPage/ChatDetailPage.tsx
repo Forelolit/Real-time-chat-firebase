@@ -38,9 +38,13 @@ export const ChatDetailPage: FC = () => {
         return new Map(members?.map((user) => [user.uid, user]));
     }, [members]);
 
-    useEffect(() => {
+    const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
-    }, [membersLoading]);
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [membersLoading, messages]);
 
     useEffect(() => {
         if (!sending) {
@@ -77,6 +81,7 @@ export const ChatDetailPage: FC = () => {
         try {
             await messageService.sendMessage(slug, mes.trim());
             setInputMes('');
+            scrollToBottom();
         } catch (error) {
             console.error('Error sending message:', error);
             toast.error('Failed to send message');
@@ -128,8 +133,6 @@ export const ChatDetailPage: FC = () => {
 
                                         return <ChatDetailOtherUserMessage key={mes.id} mes={mes} sender={sender} />;
                                     })}
-
-                                <div ref={messagesEndRef} />
                             </div>
                         )}
                     </div>
@@ -160,6 +163,8 @@ export const ChatDetailPage: FC = () => {
                             </InputGroupAddon>
                         </InputGroup>
                     </div>
+
+                    <div ref={messagesEndRef} />
                 </div>
             </Container>
         </section>

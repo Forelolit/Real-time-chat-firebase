@@ -17,7 +17,7 @@ export const ChatPage: FC = () => {
     const { data: channels = [], isLoading } = useGetChannels();
 
     return (
-        <section className="h-full">
+        <section className="h-full mb-10">
             <Container>
                 <div
                     className={clsx(

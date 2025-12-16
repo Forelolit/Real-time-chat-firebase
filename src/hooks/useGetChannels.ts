@@ -9,5 +9,6 @@ export const useGetChannels = () => {
         queryKey: ['channels', userId],
         queryFn: () => channelService.getChannels(userId!),
         enabled: !!userId,
+        refetchInterval: 5000,
     });
 };

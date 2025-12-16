@@ -50,7 +50,7 @@ export const ChannelForInviteDialog: FC<ChannelForInviteDialogProps> = ({ userId
                 Invite
             </DialogTrigger>
 
-            <DialogContent>
+            <DialogContent className="max-h-[600px] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="text-center">Channels</DialogTitle>
                 </DialogHeader>

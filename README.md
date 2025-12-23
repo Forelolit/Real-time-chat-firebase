@@ -30,8 +30,8 @@ This repository is designed as a practical example of how to build a realtime ap
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/forelolit/sibers.git
-cd sibers
+git clone https://github.com/forelolit/real-time-chat-firebase.git
+cd real-time-chat-firebase
 ```
 
 ### 2. Install dependencies
